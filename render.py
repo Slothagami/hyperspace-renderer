@@ -11,7 +11,7 @@ from math import sin, cos
     Based on: youtu.be/p4Iz0XJY-Qk and youtu.be/XE3YDVdQSPo
     Created on September 15, 2021
 """
-hypercube_dimensions = 3
+
 highlight_cell = True
 export_frames  = False
 
@@ -27,29 +27,20 @@ def cube(dimensions):
     return np.array(c)
 
 def transformMatrix(wid, hei):
-    transform = np.zeros((wid, hei))
-    for i, row in enumerate(transform):
-        row[i] = 1
-
-    return transform
-
-if hypercube_dimensions < 1: raise ValueError("Too few hypercube dimensions")
+    return np.identity(max(wid, hei))[:wid,:hei]
 
 # Globals
 width, height = 1024, 650
-dims = hypercube_dimensions # dimensions of the cube
 # there are 2^n verticies in an n dimensional cube
-scale = 5 ** dims * 1.5
 framecount = 0
-
 center = np.array([width, height]) / 2
 
 # Generate transform matrices
 # make the biggest one, and slice it for the smaller ones
-transform = transformMatrix(dims-1, dims)
-rotation  = np.zeros(dims, dtype=float)
-rotSpeed  = np.full(dims, 1)
-points    = cube(dims)
+n = 5
+rotation  = np.zeros(n, dtype=float)
+rotSpeed  = np.full(n, 1)
+points    = cube(n)
 
 class c:
     white  = (255, 255, 255)
@@ -77,7 +68,7 @@ def update():
             for pord, ptord in zip(p, point):
                 if pord == ptord: shared += 1
 
-            if shared >= dims - 1:
+            if shared >= len(point) - 1:
                 if highlight_cell:
                     color = c.dwhite if point[-1] == 1 else c.orange
                 else:
@@ -87,6 +78,7 @@ def update():
 
 # Utility
 def rotateX(a, point):
+    dims = len(point)
     rotMatrix = transformMatrix(dims, dims)
 
     if dims > 2:
@@ -98,6 +90,7 @@ def rotateX(a, point):
     return np.dot(rotMatrix,  point)
 
 def rotateN(a, point, axis):
+    dims = len(point)
     rotMatrix = transformMatrix(dims, dims)
 
     rotMatrix[   0,    0] =  cos(a)
@@ -110,7 +103,7 @@ def rotateN(a, point, axis):
 def rotate(rot, point):
     point = rotateX(rot[0], point)
 
-    for dim in range(1, dims):
+    for dim in range(1, len(point)):
         point = rotateN(rot[dim], point, dim)
 
     return point
@@ -118,20 +111,22 @@ def rotate(rot, point):
 def project(point):
     global rotation
 
-    # rotate in highest dimension
     point = rotate(rotation, point)
+    dims = len(point)
+    if dims < 1: raise ValueError("Too few Dimensions")
+    scale = 5 ** dims * 1.5
 
     # project down to 2d
     for dim in reversed(range(2, dims)):
         dist   = 4
         dscale = 1 / (dist - point[-1])
-        point  = np.dot(transform[:dim, :dim+1] * dscale, point)
+        point  = np.dot(transformMatrix(dim, dim+1) * dscale, point)
 
     return point * scale
 
 # Pygame Stuff
 pg.init()
-pg.display.set_caption(f"{dims}-Cube")
+pg.display.set_caption(f"{n}-Cube")
 window = pg.display.set_mode((width, height))
 
 while True:
