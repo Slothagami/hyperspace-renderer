@@ -11,9 +11,9 @@ from math import sin, cos
     Based on: youtu.be/p4Iz0XJY-Qk and youtu.be/XE3YDVdQSPo
     Created on September 15, 2021
 """
-hypercube_dimensions = 6
+hypercube_dimensions = 3
 highlight_cell = True
-export_frames  = True
+export_frames  = False
 
 def cube(dimensions):
     c = []
