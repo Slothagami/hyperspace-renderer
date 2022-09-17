@@ -1,18 +1,6 @@
-import numpy  as np 
+import numpy as np 
 from math import sin, cos
 
-def cube(dimensions):
-    c = []
-    for i in range(2 ** dimensions):
-        binary = bin(i)[2:]
-        binary = binary.rjust(dimensions, "0")
-        binary = [int(x) for x in binary]
-
-        vertex = [(x - .5) * 2 for x in binary]
-        c.append(vertex)
-    return np.array(c)
-
-# Utility
 def rotate_x(a, point):
     rotMatrix = np.identity(len(point))
 

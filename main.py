@@ -1,65 +1,47 @@
-from render        import *
-from pygame.locals import *
+from pygame.locals import QUIT
+from renderer      import NDRenderer, Color
 import pygame as pg
+import numpy  as np
 import sys
 
 # Functions
 def update():
-    global rotation
-
-    rotscale = 1
-    if export_frames: rotscale = 4
-
-    rotation += rotSpeed * .003 * rotscale
+    rotscale = 4 if export_frames else 1
+    render.rotation += rotSpeed * .003 * rotscale
 
     for point in points:
-        # Connect Edges (if two points share enough coordinates)
         for p in points:
-            shared = 0
-            for pord, ptord in zip(p, point):
-                if pord == ptord: shared += 1
+            # Connect Edges (if two points share enough coordinates)
+            if render.shared_ordinates(p, point) >= len(point) - 1:
+                # Handle Color Settings
+                if highlight_cell and point[-1] != 1:
+                    color = Color.orange
+                else: color = Color.dwhite
 
-            if shared >= len(point) - 1:
-                if highlight_cell:
-                    color = c.dwhite if point[-1] == 1 else c.orange
-                else:
-                    color = c.white
-
-                pg.draw.line(
-                    window, color, 
-                    project(point, rotation) + center, 
-                    project(p, rotation) + center, 
-                    2
-                )
-
-# Pygame Stuff
-class c:
-    white  = (255, 255, 255)
-    dwhite = (150, 150, 150)
-    grey   = (32, 32, 32)
-    orange = (255, 100, 0)
+                render.edge(p, point, color)
 
 # Globals
-width, height = 1024, 650
-center        = np.array([width, height]) / 2
-framecount    = 0
+size       = 1024, 650
+framecount = 0
 
 highlight_cell = True
 export_frames  = False
 
-n = 5
-rotation  = np.zeros(n, dtype=float)
-rotSpeed  = np.full(n, 1)
-points    = cube(n)
+ndims = 5
 
 pg.init()
-pg.display.set_caption(f"{n}-Cube")
-window = pg.display.set_mode((width, height))
+pg.display.set_caption(f"{ndims}-Cube")
+
+window = pg.display.set_mode(size)
+render = NDRenderer(size, window, ndims)
+
+rotSpeed  = np.full(ndims, 1)
+points    = render.cube(ndims)
 
 while True:
     framecount += 1
 
-    window.fill(c.grey)
+    window.fill(Color.grey)
     update()
     pg.display.update()
     
@@ -68,7 +50,7 @@ while True:
         pg.image.save(window, f"frames/{framecount}.jpg")
 
         errormargin = .01
-        if rotation[0] > np.pi*2 - errormargin and rotation[0] < np.pi*2 + errormargin:
+        if render.rotation[0] > np.pi*2 - errormargin and render.rotation[0] < np.pi*2 + errormargin:
             pg.quit()
             sys.exit()
 
