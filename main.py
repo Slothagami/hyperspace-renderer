@@ -1,5 +1,7 @@
+from render        import *
+from pygame.locals import *
 import pygame as pg
-from render import *
+import sys
 
 # Functions
 def update():
@@ -41,6 +43,9 @@ class c:
 width, height = 1024, 650
 center        = np.array([width, height]) / 2
 framecount    = 0
+
+highlight_cell = True
+export_frames  = False
 
 n = 5
 rotation  = np.zeros(n, dtype=float)

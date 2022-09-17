@@ -1,11 +1,5 @@
 import numpy  as np 
-import pygame as pg 
-import sys
-from pygame.locals import *
 from math import sin, cos
-
-highlight_cell = True
-export_frames  = False
 
 def cube(dimensions):
     c = []
@@ -17,9 +11,6 @@ def cube(dimensions):
         vertex = [(x - .5) * 2 for x in binary]
         c.append(vertex)
     return np.array(c)
-
-def transform_matrix(wid, hei):
-    return np.identity(max(wid, hei))[:wid,:hei]
 
 # Utility
 def rotate_x(a, point):
@@ -58,9 +49,9 @@ def project(point, rot):
     scale = 5 ** dims * 1.5
 
     # project down to 2d
-    for dim in reversed(range(2, dims)):
+    while len(point) > 2:
         dist   = 4
         dscale = 1 / (dist - point[-1])
-        point  = np.dot(transform_matrix(dim, dim+1) * dscale, point)
+        point  = point[:-1] * dscale # discard last coordinate
 
     return point * scale
