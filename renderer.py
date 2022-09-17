@@ -1,6 +1,10 @@
 from project import *
 import pygame as pg
 
+# TODO: save gif option in renderer, save directly to gif file, instead of saving frames
+    # remove make-gif.py
+    # update hypercube-inspector.py
+
 class Color:
     white  = (255, 255, 255)
     dwhite = (150, 150, 150)
