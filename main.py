@@ -25,14 +25,14 @@ def update():
 # Globals
 size           = 1024, 650
 highlight_cell = True
-ndims          = 9 # aprpx 15 min for 9 cube render
+ndims          = 5 # aprpx 15 min for 9 cube render
 
 pg.init()
 pg.display.set_caption(f"{ndims}-Cube")
 
 window = pg.display.set_mode(size)
-render = HyperspaceRenderer(size, window, ndims, f"gifs/{ndims}-Cube.gif")
-# render = HyperspaceRenderer(size, window, ndims)
+# render = HyperspaceRenderer(size, window, ndims, f"gifs/{ndims}-Cube.gif")
+render = HyperspaceRenderer(size, window, ndims)
 
 rotSpeed  = np.full(ndims, 1)
 points    = render.cube(ndims)
