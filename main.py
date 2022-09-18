@@ -1,12 +1,12 @@
 from pygame.locals import QUIT
-from renderer      import NDRenderer, Color
+from renderer      import HyperspaceRenderer, Color
 import pygame as pg
 import numpy  as np
 import sys
 
 # Functions
 def update():
-    rotscale = 4 if export_frames else 1
+    rotscale = 4 if render.save_gif else 1
     render.rotation += rotSpeed * .003 * rotscale
 
     for point in points:
@@ -20,39 +20,26 @@ def update():
 
                 render.edge(p, point, color)
 
+    render.save_frame()
+
 # Globals
-size       = 1024, 650
-framecount = 0
-
+size           = 1024, 650
 highlight_cell = True
-export_frames  = False
-
-ndims = 5
+ndims          = 5
 
 pg.init()
 pg.display.set_caption(f"{ndims}-Cube")
 
 window = pg.display.set_mode(size)
-render = NDRenderer(size, window, ndims)
+render = HyperspaceRenderer(size, window, ndims, f"gifs/{ndims}-Cube.gif")
 
 rotSpeed  = np.full(ndims, 1)
 points    = render.cube(ndims)
 
 while True:
-    framecount += 1
-
     window.fill(Color.grey)
     update()
     pg.display.update()
-    
-    # For creating Gifs
-    if export_frames:
-        pg.image.save(window, f"frames/{framecount}.jpg")
-
-        errormargin = .01
-        if render.rotation[0] > np.pi*2 - errormargin and render.rotation[0] < np.pi*2 + errormargin:
-            pg.quit()
-            sys.exit()
 
     for e in pg.event.get():
         if e.type == QUIT:

@@ -1,5 +1,9 @@
-from project import *
+from project    import *
+from PIL        import Image
+from pygifsicle import optimize as optimize_gif
 import pygame as pg
+import sys
+import imageio
 
 # TODO: save gif option in renderer, save directly to gif file, instead of saving frames
     # remove make-gif.py
@@ -11,12 +15,18 @@ class Color:
     grey   = (32, 32, 32)
     orange = (255, 100, 0)
 
-class NDRenderer:
-    def __init__(self, screen_size, window, ndims):
+class HyperspaceRenderer:
+    def __init__(self, screen_size, window, ndims, save_to=None, gif_fps=24):
         self.screen_size = screen_size
-        self.window = window 
-        self.center = np.array(screen_size) / 2
-        self.rotation = np.zeros(ndims, dtype=float)
+        self.window      = window 
+
+        self.save_to     = save_to
+        self.save_gif    = save_to is not None
+        if self.save_gif:
+            self.gif = imageio.get_writer(save_to, mode="I", duration=1/gif_fps)
+
+        self.center      = np.array(screen_size) / 2
+        self.rotation    = np.zeros(ndims, dtype=float)
     
     def point(self, point, color, radius=3):
         pg.draw.circle(
@@ -32,6 +42,19 @@ class NDRenderer:
             project(b, self.rotation) + self.center, 
             thickness
         )
+
+    def save_frame(self):
+        if self.save_gif:
+            string = pg.image.tostring(self.window, "RGBA")
+            image  = Image.frombytes("RGBA", self.screen_size, string)
+            self.gif.append_data(np.asarray(image))
+
+            errormargin = .01
+            if self.rotation[0] > np.pi*2 - errormargin and self.rotation[0] < np.pi*2 + errormargin:
+                self.gif.close()
+                optimize_gif(self.save_to)
+                pg.quit()
+                sys.exit()
 
     @staticmethod
     def shared_ordinates(a, b):
