@@ -5,9 +5,7 @@ import pygame as pg
 import sys
 import imageio
 
-# TODO: save gif option in renderer, save directly to gif file, instead of saving frames
-    # remove make-gif.py
-    # update hypercube-inspector.py
+# TODO: optimize rendering
 
 class Color:
     white  = (255, 255, 255)
