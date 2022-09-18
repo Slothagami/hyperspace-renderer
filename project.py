@@ -34,7 +34,9 @@ def project(point, rot):
     point = rotate(point, rot)
     dims = len(point)
     if dims < 1: raise ValueError("Too few Dimensions")
-    scale = 5 ** dims * 1.5
+
+    depth_scale = 4 ** (dims + 1)
+    scale = 1.5
 
     # project down to 2d
     while len(point) > 2:
@@ -42,4 +44,4 @@ def project(point, rot):
         dscale = 1 / (dist - point[-1])
         point  = point[:-1] * dscale # discard last coordinate
 
-    return point * scale
+    return point * scale * depth_scale
